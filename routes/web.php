@@ -9,7 +9,7 @@ use App\Http\Controllers\LocationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\Purchase\PurchaseOrderController;
+use App\Http\Controllers\PurchaseOrderController;
 
 // Halaman depan (public)
 Route::get('/', function () {
@@ -52,12 +52,10 @@ Route::middleware('auth')->group(function () {
         'manufacturing-orders/{manufacturingOrder}/complete',
         [ManufacturingOrderController::class, 'complete']
     )->name('manufacturing-orders.complete');
-});
 
-require __DIR__ . '/auth.php';
+    // HaKiem
 
 
-// HaKiem
 Route::prefix('purchase')->group(function () {
     Route::get('/', [PurchaseOrderController::class, 'index'])->name('purchase.index');
     Route::get('/create', [PurchaseOrderController::class, 'create'])->name('purchase.create');
@@ -66,5 +64,13 @@ Route::prefix('purchase')->group(function () {
     Route::post('/update/{id}', [PurchaseOrderController::class, 'update'])->name('purchase.update');
     Route::delete('/{id}', [PurchaseOrderController::class, 'destroy'])->name('purchase.delete');
 });
+
+});
+
+require __DIR__ . '/auth.php';
+
+
+
+
 
 
