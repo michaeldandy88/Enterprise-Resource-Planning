@@ -6,21 +6,28 @@ use App\Models\Bom;
 use App\Models\BomItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class BomController extends Controller
 {
     public function index()
     {
-        $boms = Bom::with('product')->paginate(10);
+         $boms = Bom::with('product')->orderBy('name')->paginate(10);
 
-        return view('boms.index', compact('boms'));
+        return Inertia::render('Modul/Manufacturing/BomIndex', [
+            'boms' => $boms,
+        ]);
     }
 
     public function create()
     {
-        $finishedProducts = Product::where('type', 'FINISHED')->orderBy('name')->get();
+        $finishedProducts = Product::where('type', 'FINISHED')
+            ->orderBy('name')
+            ->get();
 
-        return view('boms.create', compact('finishedProducts'));
+        return Inertia::render('Modul/Manufacturing/BomCreate', [
+            'finished_products' => $finishedProducts,
+        ]);
     }
 
     public function store(Request $request)
@@ -28,41 +35,56 @@ class BomController extends Controller
         $data = $request->validate([
             'product_id' => 'required|exists:products,id',
             'name'       => 'required|string|max:255',
+            'is_active'  => 'nullable|boolean',
         ]);
 
-        $bom = Bom::create($data);
+        $data['is_active'] = $request->has('is_active');
 
-        return redirect()->route('boms.edit', $bom)->with('success', 'BOM created. Now add items.');
+        Bom::create($data);
+
+        // setelah create BOM, balik ke modul manufacturing
+        return redirect()
+            ->route('manufacturing')
+            ->with('success', 'BOM created.');
     }
 
     public function edit(Bom $bom)
     {
         $bom->load('items.product');
 
-        $rawProducts = Product::where('type', 'RAW')->orderBy('name')->get();
+        $rawProducts = Product::where('type', 'RAW')
+            ->orderBy('name')
+            ->get();
 
-        return view('boms.edit', compact('bom', 'rawProducts'));
+        return Inertia::render('Modul/Manufacturing/BomEdit', [
+            'bom'          => $bom,
+            'raw_products' => $rawProducts,
+        ]);
     }
 
     public function update(Request $request, Bom $bom)
     {
         $data = $request->validate([
-            'name'       => 'required|string|max:255',
-            'is_active'  => 'nullable|boolean',
+            'name'      => 'required|string|max:255',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $data['is_active'] = $request->has('is_active');
 
         $bom->update($data);
 
-        return redirect()->route('boms.edit', $bom)->with('success', 'BOM updated.');
+        return redirect()
+            ->route('manufacturing')
+            ->with('success', 'BOM updated.');
     }
 
     public function destroy(Bom $bom)
     {
         $bom->delete();
 
-        return redirect()->route('boms.index')->with('success', 'BOM deleted.');
+        return redirect()
+        ->route('boms.index')
+        ->with('success', 'BOM deleted.');
     }
 
     // ====== ITEM HANDLING ======
@@ -70,15 +92,17 @@ class BomController extends Controller
     public function storeItem(Request $request, Bom $bom)
     {
         $data = $request->validate([
-            'product_id'    => 'required|exists:products,id',
-            'qty_per_unit'  => 'required|numeric|min:0.0001',
+            'product_id'   => 'required|exists:products,id',
+            'qty_per_unit' => 'required|numeric|min:0.0001',
         ]);
 
         $data['bom_id'] = $bom->id;
 
         BomItem::create($data);
 
-        return redirect()->route('boms.edit', $bom)->with('success', 'BOM item added.');
+        return redirect()
+            ->route('boms.edit', $bom)
+            ->with('success', 'BOM item added.');
     }
 
     public function destroyItem(Bom $bom, BomItem $item)
@@ -89,6 +113,9 @@ class BomController extends Controller
 
         $item->delete();
 
-        return redirect()->route('boms.edit', $bom)->with('success', 'BOM item deleted.');
+        // Tetap di halaman edit BOM, biar enak
+        return redirect()
+            ->route('boms.edit', $bom)
+            ->with('success', 'BOM item deleted.');
     }
 }

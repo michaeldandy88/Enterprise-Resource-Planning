@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class LocationController extends Controller
 {
@@ -15,20 +16,23 @@ class LocationController extends Controller
 
     public function create()
     {
-        return view('locations.create');
+        // Panggil halaman Inertia untuk create location
+        return Inertia::render('Modul/Inventory/LocationCreate');
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'code' => 'required|string|max:50|unique:locations,code',
-            'name' => 'required|string|max:255',
+            'code'        => 'required|string|max:50|unique:locations,code',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
         Location::create($data);
 
-        return redirect()->route('locations.index')->with('success', 'Location created.');
+        return redirect()
+        ->route('inventory')
+        ->with('success', 'Location created.');
     }
 
     public function edit(Location $location)
@@ -39,8 +43,8 @@ class LocationController extends Controller
     public function update(Request $request, Location $location)
     {
         $data = $request->validate([
-            'code' => 'required|string|max:50|unique:locations,code,' . $location->id,
-            'name' => 'required|string|max:255',
+            'code'        => 'required|string|max:50|unique:locations,code,' . $location->id,
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
