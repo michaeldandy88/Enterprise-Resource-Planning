@@ -6,8 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class PurchaseOrderItem extends Model
 {
-    public function purchaseOrder() {
-        return $this->belongsTo(PurchaseOrder::class);
-    }
+    protected $fillable = [
+        'purchase_order_id', 'product_id', 'qty',
+        'unit_price', 'subtotal'
+    ];
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

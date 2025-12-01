@@ -1,87 +1,75 @@
 <?php
 
-namespace App\Http\Controllers\Purchase;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\Supplier;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
 use Illuminate\Http\Request;
 
 class PurchaseOrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $orders = PurchaseOrder::with('supplier')->latest()->get();
+        return view('purchase_orders.index', compact('orders'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $suppliers = Supplier::all();
+        $products = Product::all();
+        return view('purchase_orders.create', compact('suppliers', 'products'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'supplier_id' => 'required',
-            'order_date' => 'required|date',
-            'items' => 'required|array'
+            'order_date' => 'required',
+            'items.*.product_id' => 'required',
+            'items.*.qty' => 'required|integer|min=1',
+            'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
-        $po = PurchaseOrder::create([
-            'po_number' => 'PO-' . time(),
+        // Create PO number
+        $poNumber = 'PO-' . time();
+
+        // Create Purchase Order
+        $order = PurchaseOrder::create([
             'supplier_id' => $request->supplier_id,
+            'po_number' => $poNumber,
             'order_date' => $request->order_date,
+            'status' => 'Draft',
+            'total_amount' => 0,
+            'created_by' => auth()->id(),
         ]);
+
+        $total = 0;
 
         foreach ($request->items as $item) {
+            $subtotal = $item['qty'] * $item['unit_price'];
+            $total += $subtotal;
+
             PurchaseOrderItem::create([
-                'purchase_order_id' => $po->id,
-                'item_name' => $item['name'],
+                'purchase_order_id' => $order->id,
+                'product_id' => $item['product_id'],
                 'qty' => $item['qty'],
-                'price' => $item['price'],
+                'unit_price' => $item['unit_price'],
+                'subtotal' => $subtotal,
             ]);
         }
 
-        return redirect()->back()->with('success', 'PO created!');
+        // Update total
+        $order->update(['total_amount' => $total]);
+
+        return redirect()->route('purchase-orders.index')->with('success', 'Purchase Order created!');
     }
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $order = PurchaseOrder::with('items.product', 'supplier')->findOrFail($id);
+        return view('purchase_orders.show', compact('order'));
     }
 }

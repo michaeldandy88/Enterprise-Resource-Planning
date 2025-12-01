@@ -55,3 +55,12 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+
+// HaKiem
+Route::get('/purchase', fn() => view('purchase.index'));
+Route::get('/purchase/create', fn() => view('purchase.create'));
+Route::get('/purchase/show/{id}', function($id) {
+    return view('purchase.show', compact('id'));
+});
+
