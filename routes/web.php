@@ -29,14 +29,7 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('manufacturing');
 
-    Route::get('/inventory', function () {
-        return Inertia::render('Modul/Inventory', [
-            'transactions' => \App\Models\StockTransaction::with('product', 'location')
-                ->orderByDesc('trx_date')
-                ->orderByDesc('id')
-                ->paginate(10),
-        ]);
-    })->name('inventory');
+    Route::get('/inventory', [StockTransactionController::class, 'index'])->name('inventory');
 
     Route::get('/purchase', fn () => Inertia::render('Modul/Purchase'))->name('purchase');
     Route::get('/sales', fn () => Inertia::render('Modul/Sales'))->name('sales');

@@ -4,6 +4,7 @@ import { Head, Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     transactions: Object,
+    stocks: Array,
 });
 </script>
 
@@ -38,8 +39,29 @@ const props = defineProps({
             </div>
         </template>
 
-        <div class="p-6">
+        <div class="p-6 space-y-6">
+            <!-- STOCK LEVELS -->
             <div class="rounded-lg bg-white p-6 shadow">
+                <h3 class="mb-4 text-lg font-semibold text-gray-800">Current Stock Levels</h3>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                    <div
+                        v-for="stock in stocks"
+                        :key="stock.id"
+                        class="rounded border p-4"
+                    >
+                        <div class="font-bold text-gray-800">{{ stock.name }}</div>
+                        <div class="text-xs text-gray-500 mb-2">{{ stock.code }}</div>
+                        <div class="text-2xl font-semibold" :class="stock.current_stock < 0 ? 'text-red-600' : 'text-blue-600'">
+                            {{ Number(stock.current_stock).toLocaleString() }}
+                            <span class="text-sm text-gray-500 font-normal">{{ stock.uom }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRANSACTIONS -->
+            <div class="rounded-lg bg-white p-6 shadow">
+                <h3 class="mb-4 text-lg font-semibold text-gray-800">Transaction History</h3>
                 <table class="w-full border-collapse text-left">
                     <thead>
                         <tr class="border-b font-semibold text-gray-700">

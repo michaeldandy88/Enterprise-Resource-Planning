@@ -123,6 +123,7 @@ const props = defineProps({
                 <th class="py-2">Bahan Baku</th>
                 <th>Qty per Unit</th>
                 <th>Total Required</th>
+                <th>Available Stock</th>
               </tr>
             </thead>
             <tbody>
@@ -144,6 +145,11 @@ const props = defineProps({
                 </td>
                 <td>
                   {{ req.total_required }} {{ req.raw_product?.uom }}
+                </td>
+                <td>
+                  <span :class="req.available_stock < req.total_required ? 'text-red-600 font-bold' : 'text-green-600'">
+                    {{ Number(req.available_stock).toLocaleString() }} {{ req.raw_product?.uom }}
+                  </span>
                 </td>
               </tr>
 

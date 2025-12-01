@@ -62,16 +62,27 @@ class ManufacturingOrderController extends Controller
     // DETAIL MO (masih pakai Blade sesuai aslinya)
     public function show(ManufacturingOrder $manufacturingOrder)
     {
-        $mo = $manufacturingOrder->load('product', 'bom.items.product');
+        $mo = $manufacturingOrder->load(['product', 'bom.items.product' => function ($query) {
+            $query->withSum(['stockTransactions as total_in' => function ($q) {
+                $q->where('trx_type', 'IN');
+            }], 'qty')
+            ->withSum(['stockTransactions as total_out' => function ($q) {
+                $q->where('trx_type', 'OUT');
+            }], 'qty');
+        }]);
 
         // hitung kebutuhan bahan
         $requirements = $mo->bom->items->map(function ($item) use ($mo) {
-        return [
-            'id'             => $item->id,
-            'raw_product'    => $item->product,
-            'qty_per_unit'   => $item->qty_per_unit,
-            'total_required' => $item->qty_per_unit * $mo->qty_to_produce,
-        ];
+            $product = $item->product;
+            $currentStock = ($product->total_in ?? 0) - ($product->total_out ?? 0);
+
+            return [
+                'id'             => $item->id,
+                'raw_product'    => $product,
+                'qty_per_unit'   => $item->qty_per_unit,
+                'total_required' => $item->qty_per_unit * $mo->qty_to_produce,
+                'available_stock'=> $currentStock,
+            ];
         })->values();
 
         return Inertia::render('Modul/Manufacturing/ManufacturingShow', [

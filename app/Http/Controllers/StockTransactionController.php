@@ -12,13 +12,30 @@ class StockTransactionController extends Controller
 {
     public function index()
     {
+        // 1. List Transaksi
         $transactions = StockTransaction::with('product', 'location')
             ->orderByDesc('trx_date')
             ->orderByDesc('id')
             ->paginate(10);
 
-        // ini masih pakai Blade, tidak kita ubah dulu
-        return view('stock_transactions.index', compact('transactions'));
+        // 2. Hitung Stok per Produk
+        // Rumus: Sum(IN) - Sum(OUT)
+        $stocks = Product::withSum(['stockTransactions as total_in' => function ($q) {
+            $q->where('trx_type', 'IN');
+        }], 'qty')
+        ->withSum(['stockTransactions as total_out' => function ($q) {
+            $q->where('trx_type', 'OUT');
+        }], 'qty')
+        ->get()
+        ->map(function ($product) {
+            $product->current_stock = ($product->total_in ?? 0) - ($product->total_out ?? 0);
+            return $product;
+        });
+
+        return Inertia::render('Modul/Inventory', [
+            'transactions' => $transactions,
+            'stocks'       => $stocks,
+        ]);
     }
 
     public function create()
