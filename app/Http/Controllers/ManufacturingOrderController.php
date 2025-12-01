@@ -12,6 +12,43 @@ use Illuminate\Support\Facades\DB;
 
 class ManufacturingOrderController extends Controller
 {
+    public function index()
+    {
+        $mos = ManufacturingOrder::with('product', 'bom')
+            ->orderByDesc('id')
+            ->paginate(10);
+
+        return view('manufacturing_orders.index', compact('mos'));
+    }
+
+    public function create()
+    {
+        // Ambil produk FINISHED + BOM buat dipilih
+        $boms = \App\Models\Bom::with('product')->get();
+
+        return view('manufacturing_orders.create', compact('boms'));
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'code'           => 'required|string|max:50|unique:manufacturing_orders,code',
+            'bom_id'         => 'required|exists:boms,id',
+            'qty_to_produce' => 'required|numeric|min:0.001',
+            'planned_date'   => 'nullable|date',
+            'note'           => 'nullable|string',
+        ]);
+
+        $bom = \App\Models\Bom::with('product')->findOrFail($data['bom_id']);
+
+        $data['product_id'] = $bom->product_id;
+        $data['status']     = 'DRAFT';
+
+        ManufacturingOrder::create($data);
+
+        return redirect()->route('manufacturing-orders.index')->with('success', 'MO created.');
+    }
+
     public function show(ManufacturingOrder $manufacturingOrder)
     {
         $mo = $manufacturingOrder->load('product', 'bom.items.product');
