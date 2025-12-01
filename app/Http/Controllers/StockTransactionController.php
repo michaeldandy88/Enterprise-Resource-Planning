@@ -6,6 +6,7 @@ use App\Models\StockTransaction;
 use App\Models\Product;
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class StockTransactionController extends Controller
 {
@@ -16,6 +17,7 @@ class StockTransactionController extends Controller
             ->orderByDesc('id')
             ->paginate(10);
 
+        // ini masih pakai Blade, tidak kita ubah dulu
         return view('stock_transactions.index', compact('transactions'));
     }
 
@@ -24,7 +26,11 @@ class StockTransactionController extends Controller
         $products = Product::orderBy('name')->get();
         $locations = Location::orderBy('name')->get();
 
-        return view('stock_transactions.create', compact('products', 'locations'));
+        return Inertia::render('Modul/Inventory/Create', [
+            'products'  => $products,
+            'locations' => $locations,
+            'today'     => now()->toDateString(),
+        ]);
     }
 
     public function store(Request $request)
@@ -41,6 +47,9 @@ class StockTransactionController extends Controller
 
         StockTransaction::create($data);
 
-        return redirect()->route('stock-transactions.index')->with('success', 'Stock transaction created.');
+        // Setelah create, balik ke modul inventory (Inertia)
+        return redirect()
+            ->route('inventory')
+            ->with('success', 'Stock transaction created.');
     }
 }

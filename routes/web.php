@@ -10,35 +10,46 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Halaman depan (public)
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin'      => Route::has('login'),
-        'canRegister'   => Route::has('register'),
-        'laravelVersion'=> Application::VERSION,
-        'phpVersion'    => PHP_VERSION,
-    ]);
-});
-
-// Semua route yang butuh login
 Route::middleware('auth')->group(function () {
-    // Dashboard (Inertia)
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+
+    // Dashboard
+    Route::get('/dashboard', fn () => Inertia::render('Dashboard'))->name('dashboard');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Modules (Inertia)
+    Route::get('/manufacturing', function () {
+        return Inertia::render('Modul/Manufacturing', [
+            'orders' => \App\Models\ManufacturingOrder::with('product', 'bom')
+                ->orderByDesc('created_at')
+                ->paginate(10),
+        ]);
+    })->name('manufacturing');
+
+    Route::get('/inventory', function () {
+        return Inertia::render('Modul/Inventory', [
+            'transactions' => \App\Models\StockTransaction::with('product', 'location')
+                ->orderByDesc('trx_date')
+                ->orderByDesc('id')
+                ->paginate(10),
+        ]);
+    })->name('inventory');
+
+    Route::get('/purchase', fn () => Inertia::render('Modul/Purchase'))->name('purchase');
+    Route::get('/sales', fn () => Inertia::render('Modul/Sales'))->name('sales');
+    Route::get('/invoicing', fn () => Inertia::render('Modul/Invoicing'))->name('invoicing');
+    Route::get('/employee', fn () => Inertia::render('Modul/Employee'))->name('employee');
+
     // Master
     Route::resource('products', ProductController::class);
     Route::resource('locations', LocationController::class);
 
-    // Stock adjustment (manual IN/OUT)
+    // Stock manual IN/OUT
     Route::resource('stock-transactions', StockTransactionController::class)
-        ->only(['index', 'create', 'store']);
+        ->only(['index','create','store']);
 
     // BOM
     Route::resource('boms', BomController::class);
@@ -47,10 +58,8 @@ Route::middleware('auth')->group(function () {
 
     // Manufacturing Order
     Route::resource('manufacturing-orders', ManufacturingOrderController::class);
-    Route::post(
-        'manufacturing-orders/{manufacturingOrder}/complete',
-        [ManufacturingOrderController::class, 'complete']
-    )->name('manufacturing-orders.complete');
+    Route::post('manufacturing-orders/{manufacturingOrder}/complete', [ManufacturingOrderController::class, 'complete'])
+        ->name('manufacturing-orders.complete');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
