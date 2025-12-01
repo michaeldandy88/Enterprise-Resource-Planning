@@ -10,6 +10,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\SalesOrderController;
 
 // Halaman depan (public)
 Route::get('/', function () {
@@ -54,8 +55,6 @@ Route::middleware('auth')->group(function () {
     )->name('manufacturing-orders.complete');
 
     // HaKiem
-
-
 Route::prefix('purchase')->group(function () {
     Route::get('/', [PurchaseOrderController::class, 'index'])->name('purchase.index');
     Route::get('/create', [PurchaseOrderController::class, 'create'])->name('purchase.create');
@@ -64,6 +63,15 @@ Route::prefix('purchase')->group(function () {
     Route::post('/update/{id}', [PurchaseOrderController::class, 'update'])->name('purchase.update');
     Route::delete('/{id}', [PurchaseOrderController::class, 'destroy'])->name('purchase.delete');
 });
+    Route::prefix('sales')->group(function () {
+        Route::get('/', [SalesOrderController::class, 'index'])->name('sales.index');
+        Route::get('/create', [SalesOrderController::class, 'create'])->name('sales.create');
+        Route::post('/store', [SalesOrderController::class, 'store'])->name('sales.store');
+        Route::get('/edit/{id}', [SalesOrderController::class, 'edit'])->name('sales.edit');
+        Route::post('/update/{id}', [SalesOrderController::class, 'update'])->name('sales.update');
+        Route::delete('/{id}', [SalesOrderController::class, 'destroy'])->name('sales.delete');
+    });
+
 
 });
 
