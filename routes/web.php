@@ -58,9 +58,13 @@ require __DIR__ . '/auth.php';
 
 
 // HaKiem
-Route::get('/purchase', fn() => view('purchase.index'));
-Route::get('/purchase/create', fn() => view('purchase.create'));
-Route::get('/purchase/show/{id}', function($id) {
-    return view('purchase.show', compact('id'));
+Route::prefix('purchase')->group(function () {
+    Route::get('/', [PurchaseOrderController::class, 'index'])->name('purchase.index');
+    Route::get('/create', [PurchaseOrderController::class, 'create'])->name('purchase.create');
+    Route::post('/store', [PurchaseOrderController::class, 'store'])->name('purchase.store');
+    Route::get('/edit/{id}', [PurchaseOrderController::class, 'edit'])->name('purchase.edit');
+    Route::post('/update/{id}', [PurchaseOrderController::class, 'update'])->name('purchase.update');
+    Route::delete('/{id}', [PurchaseOrderController::class, 'destroy'])->name('purchase.delete');
 });
+
 
