@@ -11,9 +11,14 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 
-// Route untuk halaman utama (root) - JANGAN DIHAPUS jika ingin halaman awal langsung ke dashboard
+// Route untuk halaman utama (root)
 Route::get('/', function () {
-    return redirect()->route('dashboard');
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
 });
 
 Route::middleware('auth')->group(function () {
