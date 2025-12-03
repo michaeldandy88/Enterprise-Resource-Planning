@@ -10,6 +10,12 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+
+// Route untuk halaman utama (root) - JANGAN DIHAPUS jika ingin halaman awal langsung ke dashboard
+Route::get('/', function () {
+    return redirect()->route('dashboard');
+});
+
 Route::middleware('auth')->group(function () {
 
     // Dashboard
