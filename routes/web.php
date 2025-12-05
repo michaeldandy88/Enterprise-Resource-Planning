@@ -84,13 +84,21 @@ Route::middleware('auth')->group(function () {
     // });
    
     Route::prefix('sales')->group(function () {
+        Route::resource('customers', \App\Http\Controllers\CustomerController::class);
         Route::get('/', [SalesOrderController::class, 'index'])->name('sales.index');
         Route::get('/create', [SalesOrderController::class, 'create'])->name('sales.create');
         Route::post('/store', [SalesOrderController::class, 'store'])->name('sales.store');
         Route::get('/edit/{id}', [SalesOrderController::class, 'edit'])->name('sales.edit');
         Route::post('/update/{id}', [SalesOrderController::class, 'update'])->name('sales.update');
         Route::delete('/{id}', [SalesOrderController::class, 'destroy'])->name('sales.delete');
+        Route::get('/{id}/print', [SalesOrderController::class, 'print'])->name('sales.print');
+        
+        // Invoice Routes
+        Route::post('/{id}/create-invoice', [\App\Http\Controllers\InvoiceController::class, 'createFromSalesOrder'])->name('sales.create_invoice');
     });
+
+    Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
+    Route::post('/invoices/{id}/status', [\App\Http\Controllers\InvoiceController::class, 'updateStatus'])->name('invoices.update_status');
 
 });
 require __DIR__ . '/auth.php';
