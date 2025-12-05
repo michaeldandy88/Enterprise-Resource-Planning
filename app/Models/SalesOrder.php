@@ -1,8 +1,10 @@
+<?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\SalesOrderItem;
-use App\Models\User;
+use App\Models\Customer;
 
 class SalesOrder extends Model
 {
@@ -17,6 +19,6 @@ class SalesOrder extends Model
 
     public function customer()
     {
-        return $this->belongsTo(User::class, 'customer_id');
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 }

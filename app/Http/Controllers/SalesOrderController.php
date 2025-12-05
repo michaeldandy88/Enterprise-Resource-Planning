@@ -6,22 +6,31 @@ use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Customer;
+use App\Models\Product;
+use Inertia\Inertia;
 
 class SalesOrderController extends Controller
 {
     // List semua Sales Order
-    public function index()
-    {
-        $orders = SalesOrder::with('items', 'customer')->get();
-        return view('sales.index', compact('orders'));
-    }
+public function index()
+{
+    $orders = SalesOrder::with('items', 'customer')->get();
 
-    // Form create
+    return Inertia::render('Modul/Sales/Sales', [
+        'orders' => $orders,
+    ]);
+}
     public function create()
     {
-        return view('sales.create');
-    }
+        $customers = Customer::all();
+        $products = Product::all();
 
+        return Inertia::render('Modul/Sales/Create', [
+            'customers' => $customers,
+            'products' => $products,
+        ]);
+    }
     // Simpan data baru
     public function store(Request $request)
     {
@@ -78,11 +87,19 @@ class SalesOrderController extends Controller
     }
 
     // Form edit
-    public function edit($id)
+   public function edit($id)
     {
-        $order = SalesOrder::with('items')->findOrFail($id);
-        return view('sales.edit', compact('order'));
+        $order = SalesOrder::with('items.product')->findOrFail($id);
+        $customers = Customer::all();
+        $products = Product::all();
+
+        return Inertia::render('Modul/Sales/Edit', [
+            'order' => $order,
+            'customers' => $customers,
+            'products' => $products,
+        ]);
     }
+
 
     // Proses update
     public function update(Request $request, $id)
@@ -90,7 +107,7 @@ class SalesOrderController extends Controller
         // VALIDASI
         $request->validate([
             'order_date'     => 'required|date',
-            'customer_id'    => 'required|exists:users,id',
+            'customer_id' => 'required|exists:customers,id',
             'product_id'     => 'required|array',
             'product_id.*'   => 'required|exists:products,id',
             'qty'            => 'required|array',
