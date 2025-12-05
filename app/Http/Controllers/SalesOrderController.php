@@ -26,7 +26,7 @@ public function index()
         $customers = Customer::all();
         $products = Product::all();
 
-        return Inertia::render('Modul/Sales/Create', [
+        return Inertia::render('Modul/Sales/SalesCreate', [
             'customers' => $customers,
             'products' => $products,
         ]);
