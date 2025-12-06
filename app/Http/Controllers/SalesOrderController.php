@@ -54,7 +54,7 @@ class SalesOrderController extends Controller
             return $product;
         });
 
-        return Inertia::render('Modul/Sales/SalesCreate', [
+        return Inertia::render('Modul/Sales/Create', [
             'customers' => $customers,
             'products' => $products,
         ]);
