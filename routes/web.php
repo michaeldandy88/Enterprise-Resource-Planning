@@ -54,7 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/inventory', [ProductController::class, 'index'])->name('inventory');
     Route::get('/inventory/history', [StockTransactionController::class, 'index'])->name('inventory.history');
 
-    Route::get('/purchase', fn () => Inertia::render('Modul/Purchase'))->name('purchase');
+    
     Route::get('/invoicing', fn () => Inertia::render('Modul/Invoicing'))->name('invoicing');
     Route::get('/employee', fn () => Inertia::render('Modul/Employee'))->name('employee');
 
@@ -79,14 +79,14 @@ Route::middleware('auth')->group(function () {
     )->name('manufacturing-orders.complete');
 
     // HaKiem
-    // Route::prefix('purchase')->group(function () {
-    // Route::get('/', [PurchaseOrderController::class, 'index'])->name('purchase.index');
-    // Route::get('/create', [PurchaseOrderController::class, 'create'])->name('purchase.create');
-    // Route::post('/store', [PurchaseOrderController::class, 'store'])->name('purchase.store');
-    // Route::get('/edit/{id}', [PurchaseOrderController::class, 'edit'])->name('purchase.edit');
-    // Route::post('/update/{id}', [PurchaseOrderController::class, 'update'])->name('purchase.update');
-    // Route::delete('/{id}', [PurchaseOrderController::class, 'destroy'])->name('purchase.delete');
-    // });
+    Route::prefix('purchase')->group(function () {
+        Route::get('/', [PurchaseOrderController::class, 'index'])->name('purchase.index');
+        Route::get('/create', [PurchaseOrderController::class, 'create'])->name('purchase.create');
+        Route::post('/store', [PurchaseOrderController::class, 'store'])->name('purchase.store');
+        Route::get('/edit/{id}', [PurchaseOrderController::class, 'edit'])->name('purchase.edit');
+        Route::post('/update/{id}', [PurchaseOrderController::class, 'update'])->name('purchase.update');
+        Route::delete('/{id}', [PurchaseOrderController::class, 'destroy'])->name('purchase.delete');
+    });
    
     Route::prefix('sales')->group(function () {
         Route::resource('customers', \App\Http\Controllers\CustomerController::class);
