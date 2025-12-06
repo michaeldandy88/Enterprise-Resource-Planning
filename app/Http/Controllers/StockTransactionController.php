@@ -18,23 +18,8 @@ class StockTransactionController extends Controller
             ->orderByDesc('id')
             ->paginate(10);
 
-        // 2. Hitung Stok per Produk
-        // Rumus: Sum(IN) - Sum(OUT)
-        $stocks = Product::withSum(['stockTransactions as total_in' => function ($q) {
-            $q->where('trx_type', 'IN');
-        }], 'qty')
-        ->withSum(['stockTransactions as total_out' => function ($q) {
-            $q->where('trx_type', 'OUT');
-        }], 'qty')
-        ->get()
-        ->map(function ($product) {
-            $product->current_stock = ($product->total_in ?? 0) - ($product->total_out ?? 0);
-            return $product;
-        });
-
-        return Inertia::render('Modul/Inventory', [
+        return Inertia::render('Modul/Inventory/History', [
             'transactions' => $transactions,
-            'stocks'       => $stocks,
         ]);
     }
 

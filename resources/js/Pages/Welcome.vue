@@ -104,8 +104,8 @@ function handleImageError() {
                             dalam satu tempat.
                         </h1>
                         <p class="max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
-                            Pantau stok, penjualan, keuangan, dan aktivitas karyawan dari satu
-                            sistem terintegrasi. Kurangi pekerjaan manual, tingkatkan akurasi
+                            Kelola Inventory, Manufacturing, Purchase, Sale, Invoicing, dan Employee
+                            dalam satu sistem terintegrasi. Kurangi pekerjaan manual, tingkatkan akurasi
                             data, dan ambil keputusan lebih cepat.
                         </p>
                     </div>
@@ -197,16 +197,16 @@ function handleImageError() {
                                         <span class="text-[10px] text-emerald-300">Live</span>
                                     </div>
                                     <div class="rounded-lg px-2 py-1.5 text-slate-300/90">
-                                        Inventory
+                                        Inventory & Mfg
                                     </div>
                                     <div class="rounded-lg px-2 py-1.5 text-slate-300/90">
-                                        Penjualan
+                                        Purchase & Sales
                                     </div>
                                     <div class="rounded-lg px-2 py-1.5 text-slate-300/90">
-                                        Keuangan
+                                        Invoicing
                                     </div>
                                     <div class="rounded-lg px-2 py-1.5 text-slate-300/90">
-                                        HR &amp; Payroll
+                                        Employee
                                     </div>
                                 </div>
                             </div>
@@ -254,38 +254,64 @@ function handleImageError() {
                         Beberapa contoh fitur yang bisa kamu kembangkan di aplikasi ini.
                     </p>
 
-                    <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <!-- Inventory -->
                         <div class="flex flex-col gap-2 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
                             <p class="text-sm font-semibold text-slate-100">
-                                Inventory &amp; Gudang
+                                Inventory
                             </p>
                             <p class="text-xs text-slate-400">
-                                Pantau stok masuk/keluar, multi gudang, stok minimum, dan
-                                notifikasi restock.
+                                Pantau stok masuk/keluar, lokasi penyimpanan, dan pergerakan barang secara real-time.
                             </p>
                         </div>
+
+                        <!-- Manufacturing -->
                         <div class="flex flex-col gap-2 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
                             <p class="text-sm font-semibold text-slate-100">
-                                Penjualan &amp; Pembelian
+                                Manufacturing
                             </p>
                             <p class="text-xs text-slate-400">
-                                Kelola SO, PO, invoice, dan integrasi ke laporan keuangan.
+                                Kelola proses produksi, Bill of Materials (BoM), dan Work Orders untuk efisiensi pabrik.
                             </p>
                         </div>
+
+                        <!-- Purchase -->
                         <div class="flex flex-col gap-2 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
                             <p class="text-sm font-semibold text-slate-100">
-                                Keuangan
+                                Purchase
                             </p>
                             <p class="text-xs text-slate-400">
-                                Jurnal umum, arus kas, piutang, hutang, dan ringkasan profit.
+                                Atur pembelian bahan baku, manajemen vendor, dan Purchase Orders (PO) dengan mudah.
                             </p>
                         </div>
+
+                        <!-- Sale -->
                         <div class="flex flex-col gap-2 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
                             <p class="text-sm font-semibold text-slate-100">
-                                HR &amp; Payroll
+                                Sale
                             </p>
                             <p class="text-xs text-slate-400">
-                                Data karyawan, absensi, lembur, dan perhitungan gaji otomatis.
+                                Buat penawaran harga, Sales Orders (SO), dan kelola hubungan dengan pelanggan (CRM).
+                            </p>
+                        </div>
+
+                        <!-- Invoicing -->
+                        <div class="flex flex-col gap-2 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
+                            <p class="text-sm font-semibold text-slate-100">
+                                Invoicing
+                            </p>
+                            <p class="text-xs text-slate-400">
+                                Terbitkan tagihan (Invoice), catat pembayaran, dan pantau status pelunasan.
+                            </p>
+                        </div>
+
+                        <!-- Employee -->
+                        <div class="flex flex-col gap-2 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
+                            <p class="text-sm font-semibold text-slate-100">
+                                Employee
+                            </p>
+                            <p class="text-xs text-slate-400">
+                                Manajemen data karyawan, struktur organisasi, dan informasi kepegawaian.
                             </p>
                         </div>
                     </div>

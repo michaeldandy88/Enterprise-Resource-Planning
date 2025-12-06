@@ -51,7 +51,8 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('manufacturing');
 
-    Route::get('/inventory', [StockTransactionController::class, 'index'])->name('inventory');
+    Route::get('/inventory', [ProductController::class, 'index'])->name('inventory');
+    Route::get('/inventory/history', [StockTransactionController::class, 'index'])->name('inventory.history');
 
     Route::get('/purchase', fn () => Inertia::render('Modul/Purchase'))->name('purchase');
     Route::get('/invoicing', fn () => Inertia::render('Modul/Invoicing'))->name('invoicing');

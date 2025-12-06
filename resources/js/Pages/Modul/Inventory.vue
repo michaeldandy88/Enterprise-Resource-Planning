@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
 const props = defineProps({
-    transactions: Object,
+    products: Object,
 });
 
 // Helper untuk format tanggal
@@ -30,22 +30,22 @@ const formatNumber = (value) => {
             <div class="flex items-center justify-between">
                 <div>
                     <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                        Inventory
+                        Inventory / Produk
                     </h2>
                     <p class="mt-1 text-sm text-gray-500">
-                        Riwayat pergerakan stok barang (Masuk & Keluar).
+                        Daftar stok barang saat ini.
                     </p>
                 </div>
 
                 <div class="flex gap-2">
                     <Link
-                        :href="route('products.index')"
+                        :href="route('inventory.history')"
                         class="rounded bg-white border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
-                        Produk
+                        Riwayat Stok
                     </Link>
                     <Link
-                        :href="route('locations.index')"
+                        :href="route('locations.create')"
                         class="rounded bg-white border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                         Lokasi
@@ -55,6 +55,12 @@ const formatNumber = (value) => {
                         class="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                     >
                         + Transaksi Manual
+                    </Link>
+                    <Link
+                        :href="route('products.create')"
+                        class="rounded bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                    >
+                        + Tambah Produk
                     </Link>
                 </div>
             </div>
@@ -69,37 +75,43 @@ const formatNumber = (value) => {
                         <table class="min-w-full border border-gray-200 rounded">
                             <thead class="bg-gray-100 text-sm text-gray-700">
                                 <tr>
-                                    <th class="p-3 border text-left">Tanggal</th>
-                                    <th class="p-3 border text-left">Produk</th>
-                                    <th class="p-3 border text-left">Lokasi</th>
-                                    <th class="p-3 border text-center">Jenis</th>
-                                    <th class="p-3 border text-right">Qty</th>
-                                    <th class="p-3 border text-left">Referensi</th>
-                                    <th class="p-3 border text-left">Catatan</th>
+                                    <th class="p-3 border text-left">Kode</th>
+                                    <th class="p-3 border text-left">Nama Produk</th>
+                                    <th class="p-3 border text-center">Satuan</th>
+                                    <th class="p-3 border text-center">Tipe</th>
+                                    <th class="p-3 border text-right bg-emerald-50">Stok Saat Ini</th>
+                                    <th class="p-3 border text-center">Status</th>
+                                    <th class="p-3 border text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="text-sm">
-                                <tr v-for="trx in transactions.data" :key="trx.id" class="hover:bg-gray-50">
-                                    <td class="p-3 border">{{ formatDate(trx.trx_date) }}</td>
-                                    <td class="p-3 border font-medium">{{ trx.product?.name || '-' }}</td>
-                                    <td class="p-3 border">{{ trx.location?.name || '-' }}</td>
+                                <tr v-for="product in products.data" :key="product.id" class="hover:bg-gray-50">
+                                    <td class="p-3 border font-mono text-gray-600">{{ product.code }}</td>
+                                    <td class="p-3 border font-medium text-gray-900">{{ product.name }}</td>
+                                    <td class="p-3 border text-center">{{ product.uom }}</td>
                                     <td class="p-3 border text-center">
-                                        <span
-                                            :class="trx.trx_type === 'IN'
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-red-100 text-red-800'"
-                                            class="px-2 py-1 rounded text-xs font-bold"
-                                        >
-                                            {{ trx.trx_type }}
+                                        <span class="px-2 py-1 rounded text-xs font-semibold"
+                                            :class="product.type === 'FINISHED' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'">
+                                            {{ product.type }}
                                         </span>
                                     </td>
-                                    <td class="p-3 border text-right font-mono">{{ formatNumber(trx.qty) }}</td>
-                                    <td class="p-3 border text-gray-600">{{ trx.reference || '-' }}</td>
-                                    <td class="p-3 border text-gray-500 text-xs italic">{{ trx.note || '-' }}</td>
+                                    <td class="p-3 border text-right font-bold text-lg bg-emerald-50 text-emerald-700">
+                                        {{ formatNumber(product.stock) }}
+                                    </td>
+                                    <td class="p-3 border text-center">
+                                        <span v-if="product.is_active" class="text-green-600 font-bold text-xs">Aktif</span>
+                                        <span v-else class="text-red-500 font-bold text-xs">Non-Aktif</span>
+                                    </td>
+                                    <td class="p-3 border text-center">
+                                        <div class="flex justify-center gap-2">
+                                            <Link :href="route('products.edit', product.id)" class="text-blue-600 hover:underline">Edit</Link>
+                                            <!-- Delete button logic can be added here if needed -->
+                                        </div>
+                                    </td>
                                 </tr>
-                                <tr v-if="transactions.data.length === 0">
+                                <tr v-if="products.data.length === 0">
                                     <td colspan="7" class="p-6 text-center text-gray-500">
-                                        Belum ada data transaksi stok.
+                                        Belum ada data produk.
                                     </td>
                                 </tr>
                             </tbody>
@@ -107,19 +119,19 @@ const formatNumber = (value) => {
                     </div>
 
                     <!-- PAGINATION -->
-                    <div class="mt-4 flex justify-between items-center" v-if="transactions.total > 0">
+                    <div class="mt-4 flex justify-between items-center" v-if="products.total > 0">
                         <div class="text-sm text-gray-500">
-                            Menampilkan {{ transactions.from }} sampai {{ transactions.to }} dari {{ transactions.total }} data.
+                            Menampilkan {{ products.from }} sampai {{ products.to }} dari {{ products.total }} data.
                         </div>
                         <div class="flex gap-1">
                             <Link
-                                v-for="(link, k) in transactions.links"
+                                v-for="(link, k) in products.links"
                                 :key="k"
                                 :href="link.url || '#'"
                                 v-html="link.label"
                                 class="px-3 py-1 border rounded text-sm"
                                 :class="{
-                                    'bg-blue-600 text-white border-blue-600': link.active,
+                                    'bg-emerald-600 text-white border-emerald-600': link.active,
                                     'bg-white text-gray-700 hover:bg-gray-50': !link.active,
                                     'opacity-50 cursor-not-allowed': !link.url
                                 }"

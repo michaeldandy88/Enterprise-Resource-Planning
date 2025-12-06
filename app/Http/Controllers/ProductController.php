@@ -10,10 +10,19 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::orderBy('code')->paginate(10);
+        $products = Product::select('products.*')
+            ->selectSub(function ($query) {
+                $query->from('stock_transactions')
+                    ->selectRaw('COALESCE(SUM(CASE WHEN trx_type = "IN" THEN qty ELSE -qty END), 0)')
+                    ->whereColumn('product_id', 'products.id');
+            }, 'stock')
+            ->orderBy('code')
+            ->paginate(10);
 
-        // Masih pakai Blade, tidak diubah dulu
-        return view('products.index', compact('products'));
+        // Menggunakan Inertia untuk render halaman Inventory
+        return Inertia::render('Modul/Inventory', [
+            'products' => $products
+        ]);
     }
 
     public function create()
@@ -43,7 +52,9 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        return view('products.edit', compact('product'));
+        return Inertia::render('Modul/Inventory/ProductEdit', [
+            'product' => $product
+        ]);
     }
 
     public function update(Request $request, Product $product)
