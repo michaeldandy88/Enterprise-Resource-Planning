@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use App\Models\SalesOrder;
+use App\Models\Product;
+
+class SalesOrderItem extends Model
+{
+    protected $fillable = [
+        'sales_order_id', 'product_id', 'qty', 'price', 'subtotal'
+    ];
+
+    public function order()
+    {
+        return $this->belongsTo(SalesOrder::class, 'sales_order_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+}

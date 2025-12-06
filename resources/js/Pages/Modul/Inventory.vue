@@ -4,8 +4,22 @@ import { Head, Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     transactions: Object,
-    stocks: Array,
 });
+
+// Helper untuk format tanggal
+const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    });
+};
+
+// Helper untuk format angka
+const formatNumber = (value) => {
+    return new Intl.NumberFormat('id-ID').format(value);
+};
 </script>
 
 <template>
@@ -13,103 +27,106 @@ const props = defineProps({
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Inventory — Stock Transactions
-            </h2>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                        Inventory
+                    </h2>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Riwayat pergerakan stok barang (Masuk & Keluar).
+                    </p>
+                </div>
 
-            <div class="flex gap-2">
-                <Link
-                    :href="route('products.create')"
-                    class="rounded bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-800 hover:bg-gray-300"
-                >
-                    + Product
-                </Link>
-                <Link
-                    :href="route('locations.create')"
-                    class="rounded bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-800 hover:bg-gray-300"
-                >
-                    + Location
-                </Link>
-                <Link
-                    :href="route('stock-transactions.create')"
-                    class="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-                >
-                    + Create Transaction
-                </Link>
+                <div class="flex gap-2">
+                    <Link
+                        :href="route('products.index')"
+                        class="rounded bg-white border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                        Produk
+                    </Link>
+                    <Link
+                        :href="route('locations.index')"
+                        class="rounded bg-white border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                        Lokasi
+                    </Link>
+                    <Link
+                        :href="route('stock-transactions.create')"
+                        class="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                    >
+                        + Transaksi Manual
+                    </Link>
+                </div>
             </div>
         </template>
 
-        <div class="p-6 space-y-6">
-            <!-- STOCK LEVELS -->
-            <div class="rounded-lg bg-white p-6 shadow">
-                <h3 class="mb-4 text-lg font-semibold text-gray-800">Current Stock Levels</h3>
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                    <div
-                        v-for="stock in stocks"
-                        :key="stock.id"
-                        class="rounded border p-4"
-                    >
-                        <div class="font-bold text-gray-800">{{ stock.name }}</div>
-                        <div class="text-xs text-gray-500 mb-2">{{ stock.code }}</div>
-                        <div class="text-2xl font-semibold" :class="stock.current_stock < 0 ? 'text-red-600' : 'text-blue-600'">
-                            {{ Number(stock.current_stock).toLocaleString() }}
-                            <span class="text-sm text-gray-500 font-normal">{{ stock.uom }}</span>
+        <div class="py-6">
+            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                    
+                    <!-- TABEL -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border border-gray-200 rounded">
+                            <thead class="bg-gray-100 text-sm text-gray-700">
+                                <tr>
+                                    <th class="p-3 border text-left">Tanggal</th>
+                                    <th class="p-3 border text-left">Produk</th>
+                                    <th class="p-3 border text-left">Lokasi</th>
+                                    <th class="p-3 border text-center">Jenis</th>
+                                    <th class="p-3 border text-right">Qty</th>
+                                    <th class="p-3 border text-left">Referensi</th>
+                                    <th class="p-3 border text-left">Catatan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr v-for="trx in transactions.data" :key="trx.id" class="hover:bg-gray-50">
+                                    <td class="p-3 border">{{ formatDate(trx.trx_date) }}</td>
+                                    <td class="p-3 border font-medium">{{ trx.product?.name || '-' }}</td>
+                                    <td class="p-3 border">{{ trx.location?.name || '-' }}</td>
+                                    <td class="p-3 border text-center">
+                                        <span
+                                            :class="trx.trx_type === 'IN'
+                                                ? 'bg-green-100 text-green-800'
+                                                : 'bg-red-100 text-red-800'"
+                                            class="px-2 py-1 rounded text-xs font-bold"
+                                        >
+                                            {{ trx.trx_type }}
+                                        </span>
+                                    </td>
+                                    <td class="p-3 border text-right font-mono">{{ formatNumber(trx.qty) }}</td>
+                                    <td class="p-3 border text-gray-600">{{ trx.reference || '-' }}</td>
+                                    <td class="p-3 border text-gray-500 text-xs italic">{{ trx.note || '-' }}</td>
+                                </tr>
+                                <tr v-if="transactions.data.length === 0">
+                                    <td colspan="7" class="p-6 text-center text-gray-500">
+                                        Belum ada data transaksi stok.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- PAGINATION -->
+                    <div class="mt-4 flex justify-between items-center" v-if="transactions.total > 0">
+                        <div class="text-sm text-gray-500">
+                            Menampilkan {{ transactions.from }} sampai {{ transactions.to }} dari {{ transactions.total }} data.
+                        </div>
+                        <div class="flex gap-1">
+                            <Link
+                                v-for="(link, k) in transactions.links"
+                                :key="k"
+                                :href="link.url || '#'"
+                                v-html="link.label"
+                                class="px-3 py-1 border rounded text-sm"
+                                :class="{
+                                    'bg-blue-600 text-white border-blue-600': link.active,
+                                    'bg-white text-gray-700 hover:bg-gray-50': !link.active,
+                                    'opacity-50 cursor-not-allowed': !link.url
+                                }"
+                            />
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- TRANSACTIONS -->
-            <div class="rounded-lg bg-white p-6 shadow">
-                <h3 class="mb-4 text-lg font-semibold text-gray-800">Transaction History</h3>
-                <table class="w-full border-collapse text-left">
-                    <thead>
-                        <tr class="border-b font-semibold text-gray-700">
-                            <th class="py-2">Tanggal</th>
-                            <th>Produk</th>
-                            <th>Lokasi</th>
-                            <th>Jenis</th>
-                            <th>Qty</th>
-                            <th>Referensi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="trx in transactions.data" :key="trx.id" class="border-b">
-                            <td class="py-2">{{ trx.trx_date }}</td>
-                            <td>{{ trx.product?.name }}</td>
-                            <td>{{ trx.location?.name }}</td>
-                            <td>
-                                <span
-                                    :class="trx.trx_type === 'IN'
-                                        ? 'text-green-600 font-semibold'
-                                        : 'text-red-600 font-semibold'"
-                                >
-                                    {{ trx.trx_type }}
-                                </span>
-                            </td>
-                            <td>{{ trx.qty }}</td>
-                            <td>{{ trx.reference }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- PAGINATION -->
-                <div class="mt-4 flex justify-between">
-                    <button
-                        :disabled="!transactions.prev_page_url"
-                        @click="$inertia.visit(transactions.prev_page_url)"
-                        class="rounded bg-gray-200 px-3 py-1 disabled:opacity-40"
-                    >
-                        Prev
-                    </button>
-
-                    <button
-                        :disabled="!transactions.next_page_url"
-                        @click="$inertia.visit(transactions.next_page_url)"
-                        class="rounded bg-gray-200 px-3 py-1 disabled:opacity-40"
-                    >
-                        Next
-                    </button>
                 </div>
             </div>
         </div>

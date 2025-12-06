@@ -9,6 +9,18 @@ use App\Http\Controllers\LocationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\SalesOrderController;
+
+// Route untuk halaman utama (root)
+Route::get('/', function () {
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
+});
 
 
 // Route untuk halaman utama (root)
@@ -22,7 +34,6 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(function () {
-
     // Dashboard
     Route::get('/dashboard', fn () => Inertia::render('Dashboard'))->name('dashboard');
 
@@ -43,7 +54,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/inventory', [StockTransactionController::class, 'index'])->name('inventory');
 
     Route::get('/purchase', fn () => Inertia::render('Modul/Purchase'))->name('purchase');
-    Route::get('/sales', fn () => Inertia::render('Modul/Sales'))->name('sales');
     Route::get('/invoicing', fn () => Inertia::render('Modul/Invoicing'))->name('invoicing');
     Route::get('/employee', fn () => Inertia::render('Modul/Employee'))->name('employee');
 
@@ -62,8 +72,37 @@ Route::middleware('auth')->group(function () {
 
     // Manufacturing Order
     Route::resource('manufacturing-orders', ManufacturingOrderController::class);
-    Route::post('manufacturing-orders/{manufacturingOrder}/complete', [ManufacturingOrderController::class, 'complete'])
-        ->name('manufacturing-orders.complete');
-});
+    Route::post(
+        'manufacturing-orders/{manufacturingOrder}/complete',
+        [ManufacturingOrderController::class, 'complete']
+    )->name('manufacturing-orders.complete');
 
-require __DIR__.'/auth.php';
+    // HaKiem
+    // Route::prefix('purchase')->group(function () {
+    // Route::get('/', [PurchaseOrderController::class, 'index'])->name('purchase.index');
+    // Route::get('/create', [PurchaseOrderController::class, 'create'])->name('purchase.create');
+    // Route::post('/store', [PurchaseOrderController::class, 'store'])->name('purchase.store');
+    // Route::get('/edit/{id}', [PurchaseOrderController::class, 'edit'])->name('purchase.edit');
+    // Route::post('/update/{id}', [PurchaseOrderController::class, 'update'])->name('purchase.update');
+    // Route::delete('/{id}', [PurchaseOrderController::class, 'destroy'])->name('purchase.delete');
+    // });
+   
+    Route::prefix('sales')->group(function () {
+        Route::resource('customers', \App\Http\Controllers\CustomerController::class);
+        Route::get('/', [SalesOrderController::class, 'index'])->name('sales.index');
+        Route::get('/create', [SalesOrderController::class, 'create'])->name('sales.create');
+        Route::post('/store', [SalesOrderController::class, 'store'])->name('sales.store');
+        Route::get('/edit/{id}', [SalesOrderController::class, 'edit'])->name('sales.edit');
+        Route::post('/update/{id}', [SalesOrderController::class, 'update'])->name('sales.update');
+        Route::delete('/{id}', [SalesOrderController::class, 'destroy'])->name('sales.delete');
+        Route::get('/{id}/print', [SalesOrderController::class, 'print'])->name('sales.print');
+        
+        // Invoice Routes
+        Route::post('/{id}/create-invoice', [\App\Http\Controllers\InvoiceController::class, 'createFromSalesOrder'])->name('sales.create_invoice');
+    });
+
+    Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
+    Route::post('/invoices/{id}/status', [\App\Http\Controllers\InvoiceController::class, 'updateStatus'])->name('invoices.update_status');
+
+});
+require __DIR__ . '/auth.php';
