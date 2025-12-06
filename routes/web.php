@@ -55,7 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/inventory/history', [StockTransactionController::class, 'index'])->name('inventory.history');
 
     
-    Route::get('/invoicing', fn () => Inertia::render('Modul/Invoicing'))->name('invoicing');
+    // Route::get('/invoicing', fn () => Inertia::render('Modul/Invoicing'))->name('invoicing');
     Route::get('/employee', fn () => Inertia::render('Modul/Employee'))->name('employee');
 
     // Master
@@ -84,8 +84,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', [PurchaseOrderController::class, 'create'])->name('purchase.create');
         Route::post('/store', [PurchaseOrderController::class, 'store'])->name('purchase.store');
         Route::get('/edit/{id}', [PurchaseOrderController::class, 'edit'])->name('purchase.edit');
-        Route::post('/update/{id}', [PurchaseOrderController::class, 'update'])->name('purchase.update');
+        Route::put('/update/{id}', [PurchaseOrderController::class, 'update'])->name('purchase.update');
         Route::delete('/{id}', [PurchaseOrderController::class, 'destroy'])->name('purchase.delete');
+
+        // Status Actions
+        Route::post('/{id}/send', [PurchaseOrderController::class, 'markAsSent'])->name('purchase.send');
+        Route::post('/{id}/confirm', [PurchaseOrderController::class, 'confirm'])->name('purchase.confirm');
+        Route::post('/{id}/receive', [PurchaseOrderController::class, 'receive'])->name('purchase.receive');
+        Route::get('/{id}/print', [PurchaseOrderController::class, 'print'])->name('purchase.print');
+        Route::get('/{id}/preview-email', [PurchaseOrderController::class, 'previewEmail'])->name('purchase.preview_email');
+        Route::post('/{id}/cancel', [PurchaseOrderController::class, 'cancel'])->name('purchase.cancel');
+        Route::post('/{id}/create-bill', [App\Http\Controllers\InvoiceController::class, 'createFromPurchaseOrder'])->name('purchase.create_bill');
+
+        // Vendor Management
+        Route::resource('vendors', \App\Http\Controllers\SupplierController::class);
     });
    
     Route::prefix('sales')->group(function () {

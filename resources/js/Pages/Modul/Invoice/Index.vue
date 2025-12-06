@@ -1,84 +1,94 @@
 <script setup>
-import { Link } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { Head, Link } from "@inertiajs/vue3";
 
 const props = defineProps({
-  invoices: Object
+  invoices: Object,
+  currentType: String
 });
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
 };
 
-const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('id-ID', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-    });
-};
+const pageTitle = props.currentType === 'PURCHASE' ? 'Vendor Bills (Tagihan Pembelian)' : 'Customer Invoices (Tagihan Penjualan)';
 </script>
 
 <template>
+  <Head :title="pageTitle" />
+
   <AuthenticatedLayout>
     <template #header>
-      <div class="flex items-center justify-between">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800">
-          Invoices
-        </h2>
-      </div>
+      <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ pageTitle }}</h2>
     </template>
 
-    <div class="py-6">
-      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div class="bg-white shadow-sm sm:rounded-lg p-6">
-          <div v-if="invoices.data.length === 0" class="text-gray-600">
-            Belum ada invoice.
-          </div>
+    <div class="py-12">
+      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        
+        <!-- TABS -->
+        <div class="flex space-x-4 mb-4 border-b border-gray-200">
+            <Link
+                :href="route('invoices.index', { type: 'SALES' })"
+                class="pb-2 px-1 text-sm font-medium border-b-2 transition-colors duration-200"
+                :class="currentType === 'SALES' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            >
+                Customer Invoices
+            </Link>
+            <Link
+                :href="route('invoices.index', { type: 'PURCHASE' })"
+                class="pb-2 px-1 text-sm font-medium border-b-2 transition-colors duration-200"
+                :class="currentType === 'PURCHASE' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            >
+                Vendor Bills
+            </Link>
+        </div>
 
-          <div v-else class="overflow-x-auto">
-            <table class="min-w-full border border-gray-200 rounded">
-              <thead class="bg-gray-100 text-sm text-gray-700">
-                <tr>
-                  <th class="p-3 border">Nomor Invoice</th>
-                  <th class="p-3 border">Tanggal</th>
-                  <th class="p-3 border">Customer</th>
-                  <th class="p-3 border">Total</th>
-                  <th class="p-3 border">Status</th>
-                  <th class="p-3 border text-center">Aksi</th>
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+          <div class="p-6 text-gray-900">
+            
+            <table class="min-w-full border-collapse border border-gray-200">
+              <thead>
+                <tr class="bg-gray-100">
+                  <th class="border p-2 text-left">No. Invoice</th>
+                  <th class="border p-2 text-left">Tanggal</th>
+                  <th class="border p-2 text-left">
+                      {{ currentType === 'PURCHASE' ? 'Supplier' : 'Customer' }}
+                  </th>
+                  <th class="border p-2 text-right">Total</th>
+                  <th class="border p-2 text-center">Status</th>
+                  <th class="border p-2 text-center">Aksi</th>
                 </tr>
               </thead>
-              <tbody class="text-sm">
+              <tbody>
                 <tr v-for="inv in invoices.data" :key="inv.id" class="hover:bg-gray-50">
-                  <td class="p-3 border font-medium">{{ inv.invoice_number }}</td>
-                  <td class="p-3 border">{{ formatDate(inv.invoice_date) }}</td>
-                  <td class="p-3 border">{{ inv.customer?.name }}</td>
-                  <td class="p-3 border text-right">{{ formatCurrency(inv.total_amount) }}</td>
-                  <td class="p-3 border text-center">
+                  <td class="border p-2 font-mono text-blue-600">{{ inv.invoice_number }}</td>
+                  <td class="border p-2">{{ inv.invoice_date }}</td>
+                  <td class="border p-2 font-medium">
+                      {{ currentType === 'PURCHASE' ? inv.supplier?.name : inv.customer?.name }}
+                  </td>
+                  <td class="border p-2 text-right">{{ formatCurrency(inv.total_amount) }}</td>
+                  <td class="border p-2 text-center">
                     <span :class="{
-                        'bg-gray-100 text-gray-800': inv.status === 'draft',
+                        'bg-gray-200 text-gray-800': inv.status === 'draft',
                         'bg-blue-100 text-blue-800': inv.status === 'posted',
                         'bg-green-100 text-green-800': inv.status === 'paid',
-                    }" class="px-2 py-1 rounded text-xs font-semibold uppercase">
+                    }" class="px-2 py-1 rounded text-xs font-bold uppercase">
                         {{ inv.status }}
                     </span>
                   </td>
-                  <td class="p-3 border text-center">
-                    <Link
-                      :href="route('invoices.show', inv.id)"
-                      class="rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-700 text-xs"
-                    >
-                      Detail
+                  <td class="border p-2 text-center">
+                    <Link :href="route('invoices.show', inv.id)" class="text-blue-600 hover:underline text-sm font-semibold">
+                        Lihat Detail
                     </Link>
                   </td>
                 </tr>
+                <tr v-if="invoices.data.length === 0">
+                    <td colspan="6" class="p-4 text-center text-gray-500">
+                        Belum ada data {{ currentType === 'PURCHASE' ? 'tagihan pembelian' : 'invoice penjualan' }}.
+                    </td>
+                </tr>
               </tbody>
             </table>
-          </div>
-
-          <!-- Pagination -->
-          <div class="mt-4 flex justify-between items-center" v-if="invoices.total > invoices.per_page">
              <div class="text-sm text-gray-500">
                 Menampilkan {{ invoices.from }} sampai {{ invoices.to }} dari {{ invoices.total }} data.
             </div>

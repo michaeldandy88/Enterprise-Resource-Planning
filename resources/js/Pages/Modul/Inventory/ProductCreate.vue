@@ -7,6 +7,8 @@ const form = useForm({
   name: '',
   uom: '',
   type: 'RAW',
+  cost: 0,
+  price: 0,
   is_active: true,
 });
 
@@ -102,6 +104,44 @@ const submit = () => {
             </select>
             <div v-if="form.errors.type" class="mt-1 text-xs text-red-600">
               {{ form.errors.type }}
+            </div>
+          </div>
+
+          <!-- Cost -->
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700">
+              Harga Beli Standar (Cost)
+            </label>
+            <div class="relative">
+                <span class="absolute left-3 top-2 text-gray-500 text-sm">Rp</span>
+                <input
+                v-model="form.cost"
+                type="number"
+                class="w-full rounded border-gray-300 text-sm pl-10"
+                placeholder="0"
+                />
+            </div>
+            <div v-if="form.errors.cost" class="mt-1 text-xs text-red-600">
+              {{ form.errors.cost }}
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700">
+              Harga Jual Standar (Price)
+            </label>
+            <div class="relative">
+                <span class="absolute left-3 top-2 text-gray-500 text-sm">Rp</span>
+                <input
+                v-model="form.price"
+                type="number"
+                class="w-full rounded border-gray-300 text-sm pl-10"
+                placeholder="0"
+                />
+            </div>
+            <div v-if="form.errors.price" class="mt-1 text-xs text-red-600">
+              {{ form.errors.price }}
             </div>
           </div>
 

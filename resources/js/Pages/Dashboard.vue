@@ -39,7 +39,7 @@ import { Head, Link } from '@inertiajs/vue3';
                 >
                     <!-- Manufacturing -->
                     <Link
-                        href="/manufacturing"
+                        :href="route('manufacturing')"
                         class="block h-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:shadow-md"
                     >
                         <div class="mb-3 text-3xl">🏭</div>
@@ -56,7 +56,7 @@ import { Head, Link } from '@inertiajs/vue3';
 
                     <!-- Inventory -->
                     <Link
-                        href="/inventory"
+                        :href="route('inventory')"
                         class="block h-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:shadow-md"
                     >
                         <div class="mb-3 text-3xl">📦</div>
@@ -73,7 +73,7 @@ import { Head, Link } from '@inertiajs/vue3';
 
                     <!-- Purchase -->
                     <Link
-                        href="/purchase"
+                        :href="route('purchase.index')"
                         class="block h-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:shadow-md"
                     >
                         <div class="mb-3 text-3xl">🛒</div>
@@ -90,7 +90,7 @@ import { Head, Link } from '@inertiajs/vue3';
 
                     <!-- Sales -->
                     <Link
-                        href="/sales"
+                        :href="route('sales.index')"
                         class="block h-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:shadow-md"
                     >
                         <div class="mb-3 text-3xl">📈</div>
@@ -107,7 +107,7 @@ import { Head, Link } from '@inertiajs/vue3';
 
                     <!-- Invoicing -->
                     <Link
-                        href="/invoicing"
+                        :href="route('invoices.index')"
                         class="block h-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:shadow-md"
                     >
                         <div class="mb-3 text-3xl">🧾</div>
@@ -124,7 +124,7 @@ import { Head, Link } from '@inertiajs/vue3';
 
                     <!-- Employee -->
                     <Link
-                        href="/employee"
+                        :href="route('employee')"
                         class="block h-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:shadow-md"
                     >
                         <div class="mb-3 text-3xl">👥</div>

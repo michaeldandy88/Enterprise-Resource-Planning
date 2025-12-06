@@ -38,6 +38,8 @@ class ProductController extends Controller
             'name'      => 'required|string|max:255',
             'uom'       => 'required|string|max:20',
             'type'      => 'required|in:RAW,FINISHED',
+            'cost'      => 'required|numeric|min:0',
+            'price'     => 'required|numeric|min:0',
             'is_active' => 'nullable|boolean',
         ]);
 
@@ -64,6 +66,8 @@ class ProductController extends Controller
             'name'      => 'required|string|max:255',
             'uom'       => 'required|string|max:20',
             'type'      => 'required|in:RAW,FINISHED',
+            'cost'      => 'required|numeric|min:0',
+            'price'     => 'required|numeric|min:0',
             'is_active' => 'nullable|boolean',
         ]);
 

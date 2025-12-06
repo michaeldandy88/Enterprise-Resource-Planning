@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $fillable = [
-        'code', 'name', 'uom', 'type', 'is_active',
+        'code', 'name', 'uom', 'type', 'cost', 'price', 'is_active',
     ];
 
     public function boms()
