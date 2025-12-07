@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SalesOrderController;
+use App\Http\Controllers\EmployeeController;
 
 // Route untuk halaman utama (root)
 Route::get('/', function () {
@@ -45,7 +46,7 @@ Route::middleware('auth')->group(function () {
     // Modules (Inertia)
     Route::get('/manufacturing', function () {
         return Inertia::render('Modul/Manufacturing', [
-            'orders' => \App\Models\ManufacturingOrder::with('product', 'bom')
+            'orders' => \App\Models\ManufacturingOrder::with('product','bom')
                 ->orderByDesc('created_at')
                 ->paginate(10),
         ]);
@@ -56,7 +57,8 @@ Route::middleware('auth')->group(function () {
 
     
     // Route::get('/invoicing', fn () => Inertia::render('Modul/Invoicing'))->name('invoicing');
-    Route::get('/employee', fn () => Inertia::render('Modul/Employee'))->name('employee');
+    Route::get('/employee', fn () => redirect()->route('employees.index'))->name('employee');
+    Route::resource('employees', EmployeeController::class);
 
     // Master
     Route::resource('products', ProductController::class);
